@@ -21,4 +21,4 @@ try{
 }
 
 
-module.exports = {db}
+module.exports = {db}   
