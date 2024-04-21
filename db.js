@@ -4,6 +4,10 @@ const dotenv = require('dotenv')
 
 dotenv.config({path:'.env'})
 
+/**
+ * The code attempts to connect to a MongoDB database using Mongoose and logs a successful connection
+ * or any errors that occur.
+ */
 const db = () =>{
     mongoose.connect(process.env.URI_MONGO)
 }
