@@ -47,6 +47,7 @@ file to the root path of the application. This means that any requests made to t
 server will be handled by the routes defined in the `index.js` file. */
 app.use('/',require('./routes/index'))
 app.use('/register',require('./routes/register'))
+app.use('/login',require('./routes/login'))
 
 
 const port = process.env.PORT || 3000
