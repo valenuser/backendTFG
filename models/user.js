@@ -5,6 +5,7 @@ const { Schema,model } = require('mongoose')
 const userSchema = new Schema({
     username:{type:String},
     email:{type:String,unique:true},
+    code:{type:Number, default:null},
     friends:[],
     groups:[]
 })

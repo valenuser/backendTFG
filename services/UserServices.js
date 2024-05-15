@@ -10,9 +10,15 @@ const { userModel } = require('../models/user')
  */
 const verifyUserEmail = async(data) =>{
 
-    const user = await userModel.find({email:data.email})
+    try{
+        const user = await userModel.find({email:data.mail})
+    
+        return user
 
-    return user
+    }catch(e){
+        return e
+    }
+
 }
 
 
@@ -54,6 +60,22 @@ const RegisterUser = async(data) =>{
     }
 }
 
+const updateCodeValidator = async(data) =>{
+
+    try{
+
+        await userModel.findOneAndUpdate({email:data.mail},{code:data.code})
+
+        return true;
+
+    }catch(e){
+
+        return false;
+
+    }
+
+}
 
 
-module.exports = {verifyUserEmail,verifyUsername,RegisterUser}
+
+module.exports = {verifyUserEmail,verifyUsername,RegisterUser,updateCodeValidator}

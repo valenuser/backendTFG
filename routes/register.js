@@ -2,7 +2,7 @@ const express =  require('express')
 
 const router = express.Router()
 
-const { verifyUserEmail,verifyUsername, RegisterUser} = require('../services/UserServices')
+const { verifyUserEmail,verifyUsername, RegisterUser, updateCodeValidator} = require('../services/UserServices')
 
 const { registerMail } = require('../services/MailServices')
 
@@ -48,6 +48,7 @@ router.post('/',(cors(corsOptionsDelegate)),async(req,res)=>{
         if(register){
 
             registerMail(email,username)
+            
             res.status(200).send({checked:'Ok'})
 
         }else{

@@ -10,7 +10,7 @@ const nodemailer = require('nodemailer')
  * @returns The `loginMail` function is returning a boolean value. If the email sending process is
  * successful, it will return `true`. If there is an error during the process, it will return `false`.
  */
-const loginMail = (data,code) =>{
+const loginMail = (data,code,username) =>{
 
     try{
         const transporter = nodemailer.createTransport({
@@ -24,7 +24,7 @@ const loginMail = (data,code) =>{
         const mailOptions = {
             from:process.env.userMail,
             to:data,
-            subject:`Hola ${data} !`,
+            subject:`Hola ${username} !`,
             text:`Aqui tienes tu código para iniciar sesion: ${code}`
         }
     
