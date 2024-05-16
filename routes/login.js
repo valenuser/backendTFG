@@ -6,6 +6,8 @@ const cors =  require('cors')
 
 const { corsOptionsDelegate } = require('../app')
 
+const jwt = require('jsonwebtoken')
+
 const { verifyUserEmail,verifyUsername, RegisterUser, updateCodeValidator} = require('../services/UserServices')
 
 const { body, validationResult} = require('express-validator')
@@ -19,16 +21,16 @@ router.use(cors({methods:['GET','POST']}))
 
 router.post('/',cors(corsOptionsDelegate),[
     body('mail','Introduce un mail valido.').exists().isEmail(),
-    body('code','Introduce un codigo valido.').exists().isLength({max:9,min:9})
+    body('code','Introduce un codigo valido.').exists().isLength({max:6,min:6})
 ],async(req,res)=>{
 
     const verify = validationResult(req)
 
-    if(!verify.isEmpty()){
+    if(verify.isEmpty() === false){
 
         const error = verify.array()
 
-        res.sendStatus(301).send(error)
+        return res.status(401).send(error)
 
     }else{
 
@@ -36,20 +38,22 @@ router.post('/',cors(corsOptionsDelegate),[
 
         const user = await verifyUserEmail({mail:mail})
 
-        if(user != null){
-            if(user.code == code){
-                const jwt = jwt.sign({user:user},process.env.SECRET_TOKEN_CLIENT)
 
-                res.sendStatus(200).send({token:jwt})
+        if(user.length > 0){
+
+            if(user[0].code == code){
+                const token = jwt.sign({user:user},process.env.SECRET_TOKEN_CLIENT)
+
+                return res.status(200).send({token:token})
 
             }else{
 
-                res.sendStatus(200).send({msg:'Codigo invalido.'})
+                return res.status(401).send({msg:'Codigo invalido.'})
 
             }
         }else{
 
-            res.sendStatus(200).send({msg:'Usuario no encontrado'})
+            return res.status(401).send({msg:'Usuario no encontrado'})
         }
 
     }

@@ -39,32 +39,35 @@ router.post('/verifyMail',(cors(corsOptionsDelegate)),async(req,res)=>{
 
     const code = Math.floor(Math.random()*1000000)
 
+    while(code.length < 6){
+        const code = Math.floor(Math.random()*1000000)
+    }
+
     const user = await verifyUserEmail({mail:mail})
 
-    console.log(user)
 
     if(user.length != 0){
         const statusMail =  loginMail(mail,code,user[0].username)
     
         if(statusMail){
     
-            const updateCodeUser = updateCodeValidator({mail:mail,code:code})
+            const updateCodeUser = await updateCodeValidator({mail:mail,code:code})
     
             if(updateCodeUser){
     
-                res.sendStatus(200)
+                res.status(200).send('Ok')
     
             }else{
-    
-                res.sendStatus(301).send({msg:'Ups... hubo un problema interno, vuelva a intentarlo mas tarde.'})
+
+                res.status(401).send({msg:'Ups... hubo un problema interno, vuelva a intentarlo mas tarde.'})
             }
     
         }else{
-            res.sendStatus(301)
+            res.status(404).send({msg:'No se ha podido enviar el mail, intentelo mas tarde.'})
         }
 
     }else{
-        res.sendStatus(301)
+        res.status(401).send({msg:'Usuario no encontrado.'})
     }
 
 })
