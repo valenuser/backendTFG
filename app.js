@@ -48,6 +48,7 @@ server will be handled by the routes defined in the `index.js` file. */
 app.use('/',require('./routes/index'))
 app.use('/register',require('./routes/register'))
 app.use('/login',require('./routes/login'))
+app.use('/token',require('./routes/token'))
 
 
 const port = process.env.PORT || 3000
