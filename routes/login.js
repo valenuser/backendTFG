@@ -44,6 +44,8 @@ router.post('/',cors(corsOptionsDelegate),[
             if(user[0].code == code){
                 const token = jwt.sign({user:user},process.env.SECRET_TOKEN_CLIENT)
 
+                console.log(token);
+
                 return res.status(200).send({token:token})
 
             }else{

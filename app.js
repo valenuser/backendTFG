@@ -10,6 +10,11 @@ const { db } = require('./db')
 
 const dotenv = require('dotenv')
 
+const http = require('http')
+
+const server = http.createServer(app)
+
+
 app.use(morgan('dev'))
 
 app.use(express.urlencoded({extended:false}))
@@ -32,6 +37,10 @@ const corsOptionsDelegate = (req,callback)=>{
 }
 
 
+
+
+
+
 /* The code `app.use(session({ secret:'secret', saveUninitialized:true, resave: true }))` is setting up
 a session middleware in the Express application. Here's what each option in the session
 configuration does: */
@@ -51,10 +60,32 @@ app.use('/login',require('./routes/login'))
 app.use('/token',require('./routes/token'))
 
 
+//socket connection
+
+const { Server } = require('socket.io')
+
+const io = new Server(server,{
+    cors:{
+        origin: '*',
+        methods:['GET','POST']
+    }
+})
+
+io.on('connection',(socket) =>{
+
+    console.log(`user  ${socket.id} connected`);
+
+    socket.on('disconnect',(msg)=>{
+        console.log('user disconnect');
+    })
+})
+
+
+
 const port = process.env.PORT || 3000
 
-app.listen(port)
+server.listen(port)
 console.log('Server running on port 3000');
 
 
-module.exports = {corsOptionsDelegate}
+module.exports = {corsOptionsDelegate, server}

@@ -13,7 +13,7 @@ const { body, validationResult } = require('express-validator')
 router.use(cors({methods:['GET','POST']}))
 
 router.post('/verifyToken',cors(corsOptionsDelegate),[
-    body('token','Token introducido no valido').exists().isString().isLength({min:324, max:324})
+    body('token','Token introducido no valido').exists().isString().isLength({min:300})
 ],(req,res)=>{
     const verify = validationResult(req)
 
@@ -25,10 +25,10 @@ router.post('/verifyToken',cors(corsOptionsDelegate),[
 
     }else{
 
+        
         try{
             const { token } = req.body
-    
-            console.log(process.env.SECRET_TOKEN_CLIENT);
+            
     
             const verifyToken = jwt.verify(token,process.env.SECRET_TOKEN_CLIENT)
 
