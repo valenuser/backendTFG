@@ -8,7 +8,7 @@ const { corsOptionsDelegate } = require('../app')
 
 const jwt = require('jsonwebtoken')
 
-const { verifyUserEmail,verifyUsername, RegisterUser, updateCodeValidator} = require('../services/UserServices')
+const { verifyUserEmail, RegisterUser, updateCodeValidator} = require('../services/UserServices')
 
 const { body, validationResult} = require('express-validator')
 

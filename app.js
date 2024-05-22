@@ -76,7 +76,13 @@ io.on('connection',(socket) =>{
     console.log(`user  ${socket.id} connected`);
 
     socket.on('disconnect',(msg)=>{
-        console.log('user disconnect');
+        console.log(`user  ${socket.id} disconnect`);
+    })
+
+    socket.on('message',(msg)=>{
+        console.log(`${socket.id}: ${msg}`);
+
+        socket.emit('message','hola, soy server')
     })
 })
 

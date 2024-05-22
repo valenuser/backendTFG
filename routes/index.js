@@ -8,7 +8,7 @@ const cors =  require('cors')
 
 const { corsOptionsDelegate} = require('../app')
 
-const { verifyUserEmail,verifyUsername, RegisterUser, updateCodeValidator} = require('../services/UserServices')
+const { verifyUserEmail, RegisterUser, updateCodeValidator} = require('../services/UserServices')
 
 const { loginMail } = require('../services/MailServices')
 

@@ -39,17 +39,27 @@ router.post('/',(cors(corsOptionsDelegate)),async(req,res)=>{
 
     }else{
 
-        const register = RegisterUser({email:email,username:username})
+        const checkUsername = await verifyUsername({username:username})
+        
+        if(checkUsername.length != 0){
 
-        if(register){
-
-            registerMail(email,username)
-            
-            res.status(200).send({msg:'Ok'})
+            res.status(401).send({msg:'El nombre de usuario ya ha sido registrado.'})
 
         }else{
-            res.status(404).send({msg:'Ups... hubo un problema al registrarse, vuelva a intentarlo mas tarde'})
+
+            const register = RegisterUser({email:email,username:username})
+    
+            if(register){
+    
+                registerMail(email,username)
+                
+                res.status(200).send({msg:'Ok'})
+    
+            }else{
+                res.status(404).send({msg:'Ups... hubo un problema al registrarse, vuelva a intentarlo mas tarde'})
+            }
         }
+
 
     }
 
