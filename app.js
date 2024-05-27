@@ -58,6 +58,8 @@ app.use('/',require('./routes/index'))
 app.use('/register',require('./routes/register'))
 app.use('/login',require('./routes/login'))
 app.use('/token',require('./routes/token'))
+app.use('/find',require('./routes/find'))
+app.use('/friends',require('./routes/friends'))
 
 
 //socket connection
@@ -71,18 +73,25 @@ const io = new Server(server,{
     }
 })
 
+ let sockets = []
+
 io.on('connection',(socket) =>{
 
+    sockets.push(socket.id)
     console.log(`user  ${socket.id} connected`);
 
     socket.on('disconnect',(msg)=>{
+        sockets = sockets.filter(x => x == socket.id)
         console.log(`user  ${socket.id} disconnect`);
     })
 
     socket.on('message',(msg)=>{
-        console.log(`${socket.id}: ${msg}`);
+        
+        const id = sockets.find(x => x != socket.id)
 
-        socket.emit('message','hola, soy server')
+        console.log(msg);
+
+        socket.to(id).emit('message',msg)
     })
 })
 

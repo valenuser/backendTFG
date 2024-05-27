@@ -36,15 +36,14 @@ router.post('/',cors(corsOptionsDelegate),[
 
         const { mail, code } = req.body
 
-        const user = await verifyUserEmail({mail:mail})
+        const user = await verifyUserEmail({email:mail})
 
 
         if(user.length > 0){
 
             if(user[0].code == code){
-                const token = jwt.sign({user:user},process.env.SECRET_TOKEN_CLIENT)
+                const token = jwt.sign({user:user[0]},process.env.SECRET_TOKEN_CLIENT)
 
-                console.log(token);
 
                 return res.status(200).send({token:token})
 

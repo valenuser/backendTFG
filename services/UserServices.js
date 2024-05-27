@@ -1,4 +1,5 @@
 const { userModel } = require('../models/user')
+const { use } = require('../routes')
 
 /**
  * The function `verifyUserEmail` asynchronously searches for a user with a specific email address in
@@ -11,12 +12,12 @@ const { userModel } = require('../models/user')
 const verifyUserEmail = async(data) =>{
 
     try{
-        const user = await userModel.find({email:data.mail})
+        const user = await userModel.find({email:data.email})
     
         return user
 
     }catch(e){
-        return e
+        return false
     }
 
 }
@@ -36,6 +37,25 @@ const verifyUsername = async(data) =>{
     const user = await userModel.find({username:data.username})
 
     return user
+}
+
+const getUsers = async(data) =>{
+
+    const user = await userModel.find({username:element.username})
+
+    return user
+}
+
+
+const userAddFriendData = (data) =>{
+    const users = []
+    data.forEach(element => async() =>{
+        const user = await getUsers(element.username)
+
+        users.push(user)
+    });
+
+    return users
 }
 
 /**
@@ -76,6 +96,31 @@ const updateCodeValidator = async(data) =>{
 
 }
 
+const searchUsers = async(name) =>{
+    try{
+
+        const regex = new RegExp(name,'i')
+
+        const users = await userModel.find({username:regex})
+
+        return users
+    }catch(e){
+        return 500;
+    }
+}
 
 
-module.exports = {verifyUserEmail,verifyUsername,RegisterUser,updateCodeValidator}
+const addFriend = async(user,data) =>{
+    try{
+
+        await userModel.updateOne({username:user},{$push:{friends:data}})
+
+        return true
+
+    }catch(e){
+        return 500
+    }
+}
+
+
+module.exports = {verifyUserEmail,verifyUsername,RegisterUser,updateCodeValidator,searchUsers, addFriend, userAddFriendData}

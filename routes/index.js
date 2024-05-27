@@ -43,9 +43,9 @@ router.post('/verifyMail',(cors(corsOptionsDelegate)),async(req,res)=>{
         const code = Math.floor(Math.random()*1000000)
     }
 
-    const user = await verifyUserEmail({mail:mail})
+    const user = await verifyUserEmail({email:mail})
 
-
+    console.log(user);
     if(user.length != 0){
         const statusMail =  loginMail(mail,code,user[0].username)
     

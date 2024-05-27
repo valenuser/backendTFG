@@ -90,6 +90,39 @@ const registerMail = (data,username) =>{
 
 
 }
+const newFriendMail = (data,username,friendName,url) =>{
+    console.log(data,username,friendName,url);
+    try{
+        const transporter = nodemailer.createTransport({
+            service:'gmail',
+            auth:{
+                user:process.env.userMail,
+                pass:process.env.passwordMail
+            }
+        })
+    
+        const mailOptions = {
+            from:process.env.userMail,
+            to:data,
+            subject:'Soliciud de amistad',
+            text:`Hola ${username}! \n${friendName} quiere añadirte a su lista de contactos, para aceptarlo ingresa en el siguiente enlace: ${url}`
+        }
+    
+        transporter.sendMail(mailOptions, function(error, info){
+            if (error) {
+              console.log(error);
+            } else {
+              console.log('Email sent: ' + info.response);
+            }
+        });
+
+        return true
+    }catch(e){
+        return false
+    }
 
 
-module.exports = {loginMail, registerMail}
+}
+
+
+module.exports = {loginMail, registerMail, newFriendMail}
