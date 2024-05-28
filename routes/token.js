@@ -38,6 +38,7 @@ router.post('/verifyToken',cors(corsOptionsDelegate),[
 
                 const data = jwt.decode(token,process.env.SECRET_TOKEN_CLIENT)
 
+
                 const user = await verifyUsername({username:data["user"]["username"]})
 
                 console.log(user);
@@ -61,6 +62,70 @@ router.post('/verifyToken',cors(corsOptionsDelegate),[
 
     }
 })
+
+router.post('/verifyTokenChat',cors(corsOptionsDelegate),[
+    body('token','Token introducido no valido').exists().isString().isLength({min:150})
+],async(req,res)=>{
+    const verify = validationResult(req)
+
+
+    if(verify.isEmpty() == false){
+        const error = verify.array()
+
+        res.status(401).send()
+
+    }else{
+
+        
+        try{
+            const { token } = req.body
+            
+    
+            const verifyToken = jwt.verify(token,process.env.SECRET_TOKEN_CLIENT)
+
+            if(verifyToken){
+
+                const data = jwt.decode(token,process.env.SECRET_TOKEN_CLIENT)
+
+                console.log(data);
+
+
+                const user = await verifyUsername({username:data["user"][0]["username"]})
+
+                if(user){
+
+                    const friend = await verifyUsername({username:data["friend"][0]["username"]})
+
+                    if(friend){
+
+                        res.status(200).send({user:user[0],friend:friend[0]})
+                    }else{
+
+                        res.status(401).send()
+                    }
+    
+    
+                }else{
+
+                    res.status(401).send()
+                }
+
+
+            }else{
+
+                res.status(401).send()
+            }
+    
+
+        }catch(e){
+            console.log(e);
+            res.status(401).send()
+        }
+
+    }
+})
+
+
 router.post('/addFriendToken',cors(corsOptionsDelegate),[
     body('token','Token introducido no valido').exists().isString().isLength({min:150})
 ],async(req,res)=>{
@@ -104,5 +169,69 @@ router.post('/addFriendToken',cors(corsOptionsDelegate),[
 })
 
 
+router.post('/chatToken',cors(corsOptionsDelegate),[
+    body('token','Token introducido no valido').exists().isString().isLength({min:150}),
+    body('friend','Token introducido no valido').exists().isObject()
+],async(req,res)=>{
+
+    const verify = validationResult(req)
+
+
+    if(verify.isEmpty() == false){
+        const error = verify.array()
+
+        res.status(401).send()
+
+    }else{
+
+        
+        try{
+            const { token, friend } = req.body
+            
+    
+            const verifyToken = jwt.verify(token,process.env.SECRET_TOKEN_CLIENT)
+
+            if(verifyToken){
+
+                const data = jwt.decode(token,process.env.SECRET_TOKEN_CLIENT)
+
+                console.log(data["user"]["username"]);
+                console.log(friend["username"]);
+
+                const user = await verifyUsername({username:data["user"]["username"]})
+
+                if(user){
+
+                    const friendData = await verifyUsername({username:friend["username"]})
+
+                    if(friendData){
+                        const newToken = jwt.sign({user:user,friend:friendData},process.env.SECRET_TOKEN_CLIENT)
+
+                        res.status(200).send(newToken)
+
+                    }else{
+
+                        res.status(401).send()
+
+                    }
+                }else{
+
+                    res.status(401).send()
+
+                }
+
+            }else{
+
+                res.status(401).send()
+            }
+    
+
+        }catch(e){
+            console.log(e);
+            res.status(401).send()
+        }
+
+    }
+})
 
 module.exports = router

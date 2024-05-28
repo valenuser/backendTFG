@@ -121,6 +121,17 @@ const addFriend = async(user,data) =>{
         return 500
     }
 }
+const addSocket = async(user,id) =>{
+    try{
+
+        await userModel.updateOne({username:user},{socketId:id})
+
+        return true
+
+    }catch(e){
+        return 500
+    }
+}
 
 
-module.exports = {verifyUserEmail,verifyUsername,RegisterUser,updateCodeValidator,searchUsers, addFriend, userAddFriendData}
+module.exports = {verifyUserEmail,verifyUsername,RegisterUser,updateCodeValidator,searchUsers, addFriend, userAddFriendData,addSocket}

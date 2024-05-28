@@ -8,9 +8,10 @@ const userSchema = new Schema({
     email:{type:String,unique:true},
     code:{type:Number, default:null},
     firstTime:{type:Boolean,default:true},
-    socketId:{type:String},
+    socketId:{type:String,default:''},
     friends:[],
-    groups:[]
+    groups:[],
+    online:{type:Boolean,default:false}
 })
 
 

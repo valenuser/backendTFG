@@ -62,6 +62,8 @@ app.use('/find',require('./routes/find'))
 app.use('/friends',require('./routes/friends'))
 
 
+const {addSocket } = require('./services/UserServices')
+
 //socket connection
 
 const { Server } = require('socket.io')
@@ -81,17 +83,24 @@ io.on('connection',(socket) =>{
     console.log(`user  ${socket.id} connected`);
 
     socket.on('disconnect',(msg)=>{
-        sockets = sockets.filter(x => x == socket.id)
+        sockets = []
         console.log(`user  ${socket.id} disconnect`);
     })
 
     socket.on('message',(msg)=>{
-        
-        const id = sockets.find(x => x != socket.id)
+        addSocket(msg["user"]["username"],socket.id)
 
+        socket.emit('message',{id:socket.id})
+    })
+
+    socket.on('connection',(msg)=>{
         console.log(msg);
+    })
 
-        socket.to(id).emit('message',msg)
+    socket.on('messageChat',(msg)=>{
+        
+        console.log(msg);
+        socket.to(msg["id"]).emit('messageChat',{msg:msg["msg"]})
     })
 })
 
