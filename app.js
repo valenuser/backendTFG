@@ -60,6 +60,7 @@ app.use('/login',require('./routes/login'))
 app.use('/token',require('./routes/token'))
 app.use('/find',require('./routes/find'))
 app.use('/friends',require('./routes/friends'))
+app.use('/gpt',require('./routes/gpt'))
 
 
 const {addSocket } = require('./services/UserServices')
@@ -100,7 +101,7 @@ io.on('connection',(socket) =>{
     socket.on('messageChat',(msg)=>{
         
         console.log(msg);
-        socket.to(msg["id"]).emit('messageChat',{msg:msg["msg"]})
+        socket.to(msg["id"]).emit('messageChat',{msg:msg["msg"],name:msg["name"],hour:msg["hour"], date:msg["date"],type:msg["type"]})
     })
 })
 

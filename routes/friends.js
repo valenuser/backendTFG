@@ -14,13 +14,15 @@ const { verifyUserEmail, verifyUsername, addFriend, userAddFriendData } = requir
 
 const { newFriendMail } = require('../services/MailServices')
 
+const { saveMessage } = require('../services/MessageServices')
+
 
 router.use(cors({methods:['GET','POST']}))
 
 
 router.post('/add',cors(corsOptionsDelegate),[
     body('email','Introduce un mail valido.').exists().isEmail(),
-    body('token','Token introducido no valido').exists().isString().isLength({min:300})
+    body('token','Token introducido no valido').exists().isString().isLength({min:150})
 ],async(req,res)=>{
 
     const verify = validationResult(req)
@@ -127,5 +129,45 @@ router.post('/addFriend',cors(corsOptionsDelegate),[
     }
 })
 
+
+router.post('/saveMessage',cors(corsOptionsDelegate),[
+    body('token','Token introducido no valido').exists().isString().isLength({min:150}),
+    body('message','No se ha podido guardar el mensaje.').exists().isObject()
+],async(req,res)=>{
+    const verify = validationResult(req)
+
+    if(verify.isEmpty() == false){
+        const error = verify.array()
+
+        res.status(401).send(error)
+
+    }else{
+        const { token, message } = req.body            
+        try{
+            const verifyToken = jwt.verify(token,process.env.SECRET_TOKEN_CLIENT)
+    
+            if(verifyToken){
+    
+                const data = jwt.decode(token,process.env.SECRET_TOKEN_CLIENT)
+
+                const user =  data["user"][0]["username"]
+                const friend =  data["friend"][0]["username"]
+
+                const saveData =  await saveMessage({firstUsername:user,secondUsername:friend,message:message["msg"],date:message["date"],hour:message["hour"]})
+
+                if(saveData){
+
+                    res.status(200).send()
+
+                }else{
+                    res.status(404).send({msg:'No se ha podido guardar el mensaje'})
+                }
+            }
+        }catch(e){
+            console.log(e);
+            res.status(404).send({msg:'No se ha podido guardar el mensaje'})
+        }
+    }
+})
 
 module.exports = router

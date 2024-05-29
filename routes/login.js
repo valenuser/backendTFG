@@ -30,7 +30,7 @@ router.post('/',cors(corsOptionsDelegate),[
 
         const error = verify.array()
 
-        return res.status(401).send(error)
+        res.status(401).send(error)
 
     }else{
 
@@ -45,16 +45,16 @@ router.post('/',cors(corsOptionsDelegate),[
                 const token = jwt.sign({user:user[0]},process.env.SECRET_TOKEN_CLIENT)
 
 
-                return res.status(200).send({token:token})
+                res.status(200).send({token:token})
 
             }else{
 
-                return res.status(401).send({msg:'Codigo invalido.'})
+                res.status(401).send({msg:'Codigo invalido.'})
 
             }
         }else{
 
-            return res.status(401).send({msg:'Usuario no encontrado'})
+            res.status(401).send({msg:'Usuario no encontrado'})
         }
 
     }
