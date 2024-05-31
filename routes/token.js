@@ -17,6 +17,7 @@ router.use(cors({methods:['GET','POST']}))
 router.post('/verifyToken',cors(corsOptionsDelegate),[
     body('token','Token introducido no valido').exists().isString().isLength({min:150})
 ],async(req,res)=>{
+    
     const verify = validationResult(req)
 
 

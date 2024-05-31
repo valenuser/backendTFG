@@ -62,6 +62,12 @@ router.post('/',cors(corsOptionsDelegate),[
 
 })
 
+router.get('/loggead',cors(corsOptionsDelegate),async(req,res)=>{
+    console.log(req.session);
+
+    res.status(200).send()
+})
+
 
 
 

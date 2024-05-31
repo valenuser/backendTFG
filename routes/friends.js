@@ -163,7 +163,7 @@ router.post('/deleteFriend',cors(corsOptionsDelegate),[
                     if(deleteFriendList){
 
                         res.status(200).send()
-                        
+
                     }else{
                         res.status(404).send({msg:'No se ha podido eliminar al contacto de amigos'})
                     }

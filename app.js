@@ -56,7 +56,9 @@ app.use('/find',require('./routes/find'))
 app.use('/friends',require('./routes/friends'))
 app.use('/gpt',require('./routes/gpt'))
 app.use('/messages',require('./routes/messages'))
-
+app.use((req,res)=>{
+    res.json({msg:'Ruta no dsponible.'})
+})
 
 const {addSocket } = require('./services/UserServices')
 
@@ -86,17 +88,15 @@ io.on('connection',(socket) =>{
 
     socket.on('connection',(msg)=>{
 
-        console.log(sockets);
+        console.log('connected');
     })
 
     socket.on('messageChat',(msg)=>{
         
-        console.log(msg);
         socket.to(msg["id"]).emit('messageChat',msg)
     })
     socket.on('backMain',(msg)=>{
         
-        console.log(msg);
         socket.to(msg["id"]).emit('backMain')
     })
 })
@@ -106,6 +106,7 @@ io.on('connection',(socket) =>{
 const port = process.env.PORT || 3000
 
 server.listen(port)
+
 console.log('Server running on port 3000');
 
 
