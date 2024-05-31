@@ -101,7 +101,7 @@ const searchUsers = async(name) =>{
 
         const regex = new RegExp(name,'i')
 
-        const users = await userModel.find({username:regex})
+        const users = await userModel.find({$or:[{username:regex},{email:regex}]})
 
         return users
     }catch(e){
@@ -134,4 +134,18 @@ const addSocket = async(user,id) =>{
 }
 
 
-module.exports = {verifyUserEmail,verifyUsername,RegisterUser,updateCodeValidator,searchUsers, addFriend, userAddFriendData,addSocket}
+const deleteFriend = async(username,friend) =>{
+    try{
+
+        const update = await userModel.findOneAndUpdate({username:username},{$pull:{friends:{username:friend}}},{ new: true })
+
+        return update
+
+    }catch(e){
+        console.log(e);
+        return false
+    }
+}
+
+
+module.exports = {verifyUserEmail,verifyUsername,RegisterUser,updateCodeValidator,searchUsers, addFriend, userAddFriendData,addSocket,deleteFriend}

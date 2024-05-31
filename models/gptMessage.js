@@ -3,15 +3,16 @@ const { Schema,model } = require('mongoose')
 
 
 /* This code snippet is defining a Mongoose schema for a user in a MongoDB database. */
-const messageSchema = new Schema({
+const gptMessageSchema = new Schema({
     firstUsername:{type:String},
     secondUsername:{type:String},
-    message:{type:String, default:null},
+    request:{type:String},
+    response:{type:String},
     date:{type:String},
     hour:{type:String}
 })
 
 
-const messageModel = model('messages',messageSchema)
+const gptmessageModel = model('gptmessage',gptMessageSchema)
 
-module.exports = {messageModel}
+module.exports = {gptmessageModel}

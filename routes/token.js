@@ -26,8 +26,6 @@ router.post('/verifyToken',cors(corsOptionsDelegate),[
         res.status(401).send()
 
     }else{
-
-        
         try{
             const { token } = req.body
             
@@ -41,11 +39,9 @@ router.post('/verifyToken',cors(corsOptionsDelegate),[
 
                 const user = await verifyUsername({username:data["user"]["username"]})
 
-                console.log(user);
 
                 data["user"]["friends"] = user[0]["friends"]
 
-                console.log(data);
 
                 res.status(200).send(data)
 

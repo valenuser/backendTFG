@@ -10,7 +10,7 @@ const { corsOptionsDelegate } = require('../app')
 
 const { body, validationResult } = require('express-validator')
 
-const { verifyUserEmail, verifyUsername, addFriend, userAddFriendData } = require('../services/UserServices')
+const { verifyUserEmail, verifyUsername, addFriend, userAddFriendData,deleteFriend  } = require('../services/UserServices')
 
 const { newFriendMail } = require('../services/MailServices')
 
@@ -130,9 +130,8 @@ router.post('/addFriend',cors(corsOptionsDelegate),[
 })
 
 
-router.post('/saveMessage',cors(corsOptionsDelegate),[
-    body('token','Token introducido no valido').exists().isString().isLength({min:150}),
-    body('message','No se ha podido guardar el mensaje.').exists().isObject()
+router.post('/deleteFriend',cors(corsOptionsDelegate),[
+    body('token','No se ha podido eliminar al contacto de amigos').exists().isString().isLength({min:150})
 ],async(req,res)=>{
     const verify = validationResult(req)
 
@@ -142,7 +141,7 @@ router.post('/saveMessage',cors(corsOptionsDelegate),[
         res.status(401).send(error)
 
     }else{
-        const { token, message } = req.body            
+        const { token } = req.body            
         try{
             const verifyToken = jwt.verify(token,process.env.SECRET_TOKEN_CLIENT)
     
@@ -153,19 +152,28 @@ router.post('/saveMessage',cors(corsOptionsDelegate),[
                 const user =  data["user"][0]["username"]
                 const friend =  data["friend"][0]["username"]
 
-                const saveData =  await saveMessage({firstUsername:user,secondUsername:friend,message:message["msg"],date:message["date"],hour:message["hour"]})
+                const deleteData =  await deleteFriend(user,friend)
 
-                if(saveData){
+                console.log(deleteData);
 
-                    res.status(200).send()
+                if(deleteData){
 
+                    const deleteFriendList = await deleteFriend(friend,user)
+
+                    if(deleteFriendList){
+
+                        res.status(200).send()
+                        
+                    }else{
+                        res.status(404).send({msg:'No se ha podido eliminar al contacto de amigos'})
+                    }
                 }else{
-                    res.status(404).send({msg:'No se ha podido guardar el mensaje'})
+                    res.status(404).send({msg:'No se ha podido eliminar al contacto de amigos'})
                 }
             }
         }catch(e){
             console.log(e);
-            res.status(404).send({msg:'No se ha podido guardar el mensaje'})
+            res.status(404).send({msg:'No se ha podido eliminar al contacto de amigos'})
         }
     }
 })

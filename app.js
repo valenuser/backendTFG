@@ -16,14 +16,12 @@ const server = http.createServer(app)
 
 
 app.use(morgan('dev'))
-
 app.use(express.urlencoded({extended:false}))
 app.use(express.json())
 dotenv.config({path:'.env'})
 
 /* The code block you provided is setting up a CORS (Cross-Origin Resource Sharing) configuration using
 a whitelist approach in an Express application. Here's a breakdown of what it does: */
-
 const whiteList = ['http://localhost:8080']
 
 const corsOptionsDelegate = (req,callback)=>{
@@ -35,10 +33,6 @@ const corsOptionsDelegate = (req,callback)=>{
     }
     callback(null,corsOptions)
 }
-
-
-
-
 
 
 /* The code `app.use(session({ secret:'secret', saveUninitialized:true, resave: true }))` is setting up
@@ -61,6 +55,7 @@ app.use('/token',require('./routes/token'))
 app.use('/find',require('./routes/find'))
 app.use('/friends',require('./routes/friends'))
 app.use('/gpt',require('./routes/gpt'))
+app.use('/messages',require('./routes/messages'))
 
 
 const {addSocket } = require('./services/UserServices')
@@ -76,15 +71,10 @@ const io = new Server(server,{
     }
 })
 
- let sockets = []
 
 io.on('connection',(socket) =>{
 
-    sockets.push(socket.id)
-    console.log(`user  ${socket.id} connected`);
-
     socket.on('disconnect',(msg)=>{
-        sockets = []
         console.log(`user  ${socket.id} disconnect`);
     })
 
@@ -95,13 +85,19 @@ io.on('connection',(socket) =>{
     })
 
     socket.on('connection',(msg)=>{
-        console.log(msg);
+
+        console.log(sockets);
     })
 
     socket.on('messageChat',(msg)=>{
         
         console.log(msg);
-        socket.to(msg["id"]).emit('messageChat',{msg:msg["msg"],name:msg["name"],hour:msg["hour"], date:msg["date"],type:msg["type"]})
+        socket.to(msg["id"]).emit('messageChat',msg)
+    })
+    socket.on('backMain',(msg)=>{
+        
+        console.log(msg);
+        socket.to(msg["id"]).emit('backMain')
     })
 })
 
