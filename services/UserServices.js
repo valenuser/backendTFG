@@ -96,6 +96,22 @@ const updateCodeValidator = async(data) =>{
 
 }
 
+const deleteCodeValidator = async(data) =>{
+
+    try{
+
+        await userModel.findOneAndUpdate({email:data.email},{code:''})
+
+        return true;
+
+    }catch(e){
+
+        return false;
+
+    }
+
+}
+
 const searchUsers = async(name) =>{
     try{
 
@@ -184,4 +200,29 @@ const findUserbyToken = async(username,token) =>{
 }
 
 
-module.exports = {verifyUserEmail,verifyUsername,RegisterUser,updateCodeValidator,searchUsers, addFriend, userAddFriendData,addSocket,deleteFriend,addToken,findUserbyToken,deleteSocket}
+const userloggead = async(username) =>{
+    try{
+
+        const update = await userModel.findOneAndUpdate({username:username},{loggead:true})
+
+        return update
+
+    }catch(e){
+        console.log(e);
+        return false
+    }
+}
+const userdisconnected = async(username) =>{
+    try{
+
+        const update = await userModel.findOneAndUpdate({username:username},{loggead:false})
+
+        return update
+
+    }catch(e){
+        console.log(e);
+        return false
+    }
+}
+
+module.exports = {verifyUserEmail,verifyUsername,RegisterUser,updateCodeValidator,searchUsers, addFriend, userAddFriendData,addSocket,deleteFriend,addToken,findUserbyToken,deleteSocket,deleteCodeValidator,userloggead,userdisconnected}

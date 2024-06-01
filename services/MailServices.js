@@ -58,8 +58,8 @@ const adviceChat = (friendMail,friend,username) =>{
         const mailOptions = {
             from:process.env.userMail,
             to:friendMail,
-            subject:`Hola ${friend} !`,
-            text:`${username} quiere hablar contigo!, entra ya y empieza a hablar con el siguiente enlace: http://localhost:8080`
+            subject:`Aviso de chat`,
+            text:`Hola ${friend}! \n ${username} quiere hablar contigo!, entra ya y empieza a hablar con el siguiente enlace: http://localhost:8080`
         }
     
         transporter.sendMail(mailOptions, function(error, info){

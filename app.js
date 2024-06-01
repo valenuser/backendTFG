@@ -77,6 +77,7 @@ const io = new Server(server,{
 io.on('connection',(socket) =>{
 
     socket.on('disconnect',(msg)=>{
+
         console.log(`user  ${socket.id} disconnect`);
     })
 
@@ -93,7 +94,7 @@ io.on('connection',(socket) =>{
     })
 
     socket.on('messageChat',(msg)=>{
-        
+        console.log(msg);
         socket.to(msg["id"]).emit('messageChat',msg)
     })
     socket.on('backMain',(msg)=>{
@@ -101,9 +102,8 @@ io.on('connection',(socket) =>{
         socket.to(msg["id"]).emit('backMain')
     })
 
-    socket.on('notificationLoggead',(msg)=>{
+    socket.on('updateSocket',(msg)=>{
 
-        console.log('a');
 
         if(msg["user"]["friends"].length > 0 ){
             msg["user"]["friends"].forEach(async(element) => {
@@ -112,7 +112,7 @@ io.on('connection',(socket) =>{
                 
                 data.forEach(element =>{
 
-                    socket.to(element["socketId"]).emit('notificationLoggead',`${msg["user"]["username"]} esta disponible!`)
+                    socket.to(element["socketId"]).emit('updateSocket',{user:msg["user"]["username"],socket:socket.id})
 
                 })
             });

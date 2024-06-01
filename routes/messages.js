@@ -11,7 +11,7 @@ const { corsOptionsDelegate } = require('../app')
 const { body, validationResult } = require('express-validator')
 
 
-const { saveMessage,savegptMessage,messagesChat,messagesgptChat,deleteMessage } = require('../services/MessageServices')
+const { saveMessage,savegptMessage,messagesChat,messagesgptChat,deleteMessage, deletegptMessage } = require('../services/MessageServices')
 
 const {adviceChat} = require('../services/MailServices')
 
@@ -270,6 +270,50 @@ router.post('/deleteMessage',cors(corsOptionsDelegate),[
         }
     }
 })
+
+router.post('/deletegptMessage',cors(corsOptionsDelegate),[
+    body('token','Token introducido no valido').exists().isString().isLength({min:150}),
+    body('message','No se ha podido eliminar el mensaje.').exists().isObject()
+],async(req,res)=>{
+    const verify = validationResult(req)
+
+    if(verify.isEmpty() == false){
+        const error = verify.array()
+
+        res.status(401).send(error)
+
+    }else{
+        const { token, message } = req.body            
+        try{
+            const verifyToken = jwt.verify(token,process.env.SECRET_TOKEN_CLIENT)
+    
+            if(verifyToken){
+    
+                const data = jwt.decode(token,process.env.SECRET_TOKEN_CLIENT)
+
+
+                const deleteMessage = await deletegptMessage({firstUsername:message["firstUsername"],secondUsername:message["secondUsername"],request:message["request"],response:message["response"],date:message["date"],hour:message["hour"]})
+
+                if(deleteMessage){
+
+                    res.status(200).send()
+
+                }else{
+
+                    res.status(404).send({msg:'No se ha podido eliminar el mensaje.'})
+                }
+
+            }else{
+                res.status(404).send({msg:'No se ha podido eliminar el mensaje.'})
+            }
+        }catch(e){
+            console.log(e);
+            res.status(404).send({msg:'No se ha podido eliminar el mensaje.'})
+        }
+    }
+})
+
+
 router.post('/deleteUserMessage',cors(corsOptionsDelegate),[
     body('token','Token introducido no valido').exists().isString().isLength({min:150}),
     body('message','No se ha podido eliminar el mensaje.').exists().isObject()
@@ -314,52 +358,6 @@ router.post('/deleteUserMessage',cors(corsOptionsDelegate),[
         }
     }
 })
-
-router.post('/deletegptMessage',cors(corsOptionsDelegate),[
-    body('token','Token introducido no valido').exists().isString().isLength({min:150}),
-    body('message','No se ha podido eliminar el mensaje.').exists().isObject()
-],async(req,res)=>{
-    const verify = validationResult(req)
-
-    if(verify.isEmpty() == false){
-        const error = verify.array()
-
-        res.status(401).send(error)
-
-    }else{
-        const { token, message } = req.body            
-        try{
-            const verifyToken = jwt.verify(token,process.env.SECRET_TOKEN_CLIENT)
-    
-            if(verifyToken){
-    
-                const data = jwt.decode(token,process.env.SECRET_TOKEN_CLIENT)
-
-                const user =  data["user"][0]["username"]
-                const friend =  data["friend"][0]["username"]
-
-
-
-                const messageDeleted = await deleteMessage(friend,user,message)
-    
-                if(messageDeleted){
-                    
-                    res.status(200).send()
-                    
-                }else{
-                       res.status(404).send({msg:'No se ha podido eliminar el mensaje.'})
-                }
-
-            }else{
-                res.status(404).send({msg:'No se ha podido eliminar el mensaje.'})
-            }
-        }catch(e){
-            console.log(e);
-            res.status(404).send({msg:'No se ha podido eliminar el mensaje.'})
-        }
-    }
-})
-
 
 
 module.exports = router

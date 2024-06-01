@@ -37,7 +37,7 @@ request is made to this endpoint, it expects a request body containing a 'mail' 
 router.post('/verifyMail',(cors(corsOptionsDelegate)),async(req,res)=>{
     const {mail} = req.body
 
-    const code = Math.floor(Math.random()*1000000)
+    const code = Math.floor(100000 + Math.random()*900000)
 
     while(code.length < 6){
         const code = Math.floor(Math.random()*1000000)

@@ -64,7 +64,7 @@ const deleteMessage = async(user,friend,data) =>{
         return false
     }
 }
-const deletegptMessage = async(user,friend,data) =>{
+const deletegptMessage = async(data) =>{
     try{
 
         await gptmessageModel.findOneAndDelete({firstUsername:data.firstUsername,secondUsername:data.secondUsername,request:data.request,response:data.response,date:data.date,hour:data.hour})

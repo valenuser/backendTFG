@@ -85,7 +85,6 @@ router.post('/verifyTokenChat',cors(corsOptionsDelegate),[
                 const data = jwt.decode(token,process.env.SECRET_TOKEN_CLIENT)
 
 
-
                 const user = await verifyUsername({username:data["user"][0]["username"]})
 
                 if(user){
@@ -93,6 +92,9 @@ router.post('/verifyTokenChat',cors(corsOptionsDelegate),[
                     const friend = await verifyUsername({username:data["friend"][0]["username"]})
 
                     if(friend){
+
+                        console.log(user);
+                        console.log(friend);
 
                         res.status(200).send({user:user[0],friend:friend[0]})
                     }else{

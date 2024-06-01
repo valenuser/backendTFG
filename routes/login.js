@@ -8,7 +8,7 @@ const { corsOptionsDelegate } = require('../app')
 
 const jwt = require('jsonwebtoken')
 
-const { verifyUserEmail,deleteSocket} = require('../services/UserServices')
+const { verifyUserEmail,deleteSocket,deleteCodeValidator,userloggead,userdisconnected} = require('../services/UserServices')
 
 const { body, validationResult} = require('express-validator')
 
@@ -41,16 +41,34 @@ router.post('/',cors(corsOptionsDelegate),[
 
         if(user.length > 0){
 
-            if(user[0].code == code){
-                const token = jwt.sign({user:user[0]},process.env.SECRET_TOKEN_CLIENT,{expiresIn:'2h'})
+            if(user[0]["loggead"] == false){
+                
+                            if(user[0].code == code){
 
 
-                res.status(200).send({token:token})
+                                const loggeadState = await userloggead(user[0]["username"])
 
+                                if(loggeadState){
+
+                                    const token = jwt.sign({user:user[0]},process.env.SECRET_TOKEN_CLIENT,{expiresIn:'2h'})
+                    
+                    
+                                    res.status(200).send({token:token})
+
+                                }else{
+
+                                    res.status(401).send({msg:'No se ha podido iniciar sesion correctamente, intentelo de nuevo.'})
+
+                                }
+
+                            }else{
+                
+                                res.status(401).send({msg:'Codigo invalido.'})
+                
+                            }
             }else{
 
-                res.status(401).send({msg:'Codigo invalido.'})
-
+                res.status(401).send({msg:'El usuario ya tiene una sesion iniciada'})
             }
         }else{
 
@@ -59,12 +77,6 @@ router.post('/',cors(corsOptionsDelegate),[
 
     }
 
-})
-
-router.get('/loggead',cors(corsOptionsDelegate),async(req,res)=>{
-    console.log(req.session);
-
-    res.status(200).send()
 })
 
 
@@ -93,16 +105,29 @@ router.post('/logout',cors(corsOptionsDelegate),[
                 const data = jwt.decode(token,process.env.SECRET_TOKEN_CLIENT)
                 
                 const username = data["user"]["username"];
+                const email = data["user"]["email"];
 
                 const updateSocket = await deleteSocket(username)
 
                 if(updateSocket){
 
-                    res.status(200).send()
+                    const updateCode = await deleteCodeValidator({email:email})
 
+                    if(updateCode){
+
+                        const updateStateloggead = await userdisconnected(username)
+
+                        if(updateStateloggead){
+
+                            res.status(200).send()
+
+                        }
+                    }else{
+                        res.status(401).send({msg:'La sesion no se ha cerrado correctamente.'})
+                    }
                 }else{
 
-                    res.status(401).send({msg:'El token no es valido'})
+                    res.status(401).send({msg:'La sesion no se ha cerrado correctamente.'})
                 }
 
             }
