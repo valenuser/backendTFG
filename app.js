@@ -10,15 +10,18 @@ const { db } = require('./db')
 
 const dotenv = require('dotenv')
 
-app.use(morgan('dev'))
+const http = require('http')
 
+const server = http.createServer(app)
+
+
+app.use(morgan('dev'))
 app.use(express.urlencoded({extended:false}))
 app.use(express.json())
 dotenv.config({path:'.env'})
 
 /* The code block you provided is setting up a CORS (Cross-Origin Resource Sharing) configuration using
 a whitelist approach in an Express application. Here's a breakdown of what it does: */
-
 const whiteList = ['http://localhost:8080']
 
 const corsOptionsDelegate = (req,callback)=>{
@@ -47,12 +50,102 @@ file to the root path of the application. This means that any requests made to t
 server will be handled by the routes defined in the `index.js` file. */
 app.use('/',require('./routes/index'))
 app.use('/register',require('./routes/register'))
+app.use('/login',require('./routes/login'))
+app.use('/token',require('./routes/token'))
+app.use('/find',require('./routes/find'))
+app.use('/friends',require('./routes/friends'))
+app.use('/gpt',require('./routes/gpt'))
+app.use('/messages',require('./routes/messages'))
+app.use((req,res)=>{
+    res.json({msg:'Ruta no dsponible.'})
+})
+
+const {addSocket, verifyUsername } = require('./services/UserServices')
+
+//socket connection
+
+const { Server } = require('socket.io')
+
+const io = new Server(server,{
+    cors:{
+        origin: '*',
+        methods:['GET','POST']
+    }
+})
+
+
+io.on('connection',(socket) =>{
+
+    socket.on('disconnect',(msg)=>{
+
+        console.log(`user  ${socket.id} disconnect`);
+    })
+
+    socket.on('message',(msg)=>{
+        console.log(`connected ${socket.id}`);
+         addSocket(msg["user"]["username"],socket.id)
+
+        socket.emit('message',{id:socket.id})
+    })
+
+    socket.on('connection',(msg)=>{
+
+        console.log('connected');
+    })
+
+    socket.on('messageChat',(msg)=>{
+        console.log(msg);
+        socket.to(msg["id"]).emit('messageChat',msg)
+    })
+    socket.on('backMain',(msg)=>{
+        
+        socket.to(msg["id"]).emit('backMain')
+    })
+
+    socket.on('updateSocket',(msg)=>{
+
+
+        if(msg["user"]["friends"].length > 0 ){
+            msg["user"]["friends"].forEach(async(element) => {
+
+                const data = await verifyUsername({username:element["username"]})
+                
+                data.forEach(element =>{
+
+                    socket.to(element["socketId"]).emit('updateSocket',{user:msg["user"]["username"],socket:socket.id})
+
+                })
+            });
+        }
+
+        
+    })
+    socket.on('notAvailable',(msg)=>{
+
+        if(msg["user"]["friends"].length > 0 ){
+            msg["user"]["friends"].forEach(async(element) => {
+
+                const data = await verifyUsername({username:element["username"]})
+                
+                data.forEach(element =>{
+
+                    socket.to(element["socketId"]).emit('notAvailable',`${msg["user"]["username"]} no esta disponible.`)
+
+                })
+            });
+        }
+
+        
+    })
+})
+
 
 
 const port = process.env.PORT || 3000
 
-app.listen(port)
+server.listen(port)
+
 console.log('Server running on port 3000');
 
 
-module.exports = {corsOptionsDelegate}
+module.exports = {corsOptionsDelegate, server}

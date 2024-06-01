@@ -1,4 +1,5 @@
 const { userModel } = require('../models/user')
+const { use } = require('../routes')
 
 /**
  * The function `verifyUserEmail` asynchronously searches for a user with a specific email address in
@@ -10,9 +11,15 @@ const { userModel } = require('../models/user')
  */
 const verifyUserEmail = async(data) =>{
 
-    const user = await userModel.find({email:data.email})
+    try{
+        const user = await userModel.find({email:data.email})
+    
+        return user
 
-    return user
+    }catch(e){
+        return false
+    }
+
 }
 
 
@@ -30,6 +37,25 @@ const verifyUsername = async(data) =>{
     const user = await userModel.find({username:data.username})
 
     return user
+}
+
+const getUsers = async(data) =>{
+
+    const user = await userModel.find({username:element.username})
+
+    return user
+}
+
+
+const userAddFriendData = (data) =>{
+    const users = []
+    data.forEach(element => async() =>{
+        const user = await getUsers(element.username)
+
+        users.push(user)
+    });
+
+    return users
 }
 
 /**
@@ -54,6 +80,149 @@ const RegisterUser = async(data) =>{
     }
 }
 
+const updateCodeValidator = async(data) =>{
+
+    try{
+
+        await userModel.findOneAndUpdate({email:data.mail},{code:data.code})
+
+        return true;
+
+    }catch(e){
+
+        return false;
+
+    }
+
+}
+
+const deleteCodeValidator = async(data) =>{
+
+    try{
+
+        await userModel.findOneAndUpdate({email:data.email},{code:''})
+
+        return true;
+
+    }catch(e){
+
+        return false;
+
+    }
+
+}
+
+const searchUsers = async(name) =>{
+    try{
+
+        const regex = new RegExp(name,'i')
+
+        const users = await userModel.find({$or:[{username:regex},{email:regex}]})
+
+        return users
+    }catch(e){
+        return 500;
+    }
+}
 
 
-module.exports = {verifyUserEmail,verifyUsername,RegisterUser}
+const addFriend = async(user,data) =>{
+    try{
+
+        await userModel.updateOne({username:user},{$push:{friends:data}})
+
+        return true
+
+    }catch(e){
+        return 500
+    }
+}
+
+const addSocket = async(user,id) =>{
+    try{
+
+        await userModel.updateOne({username:user},{socketId:id})
+
+        return true
+
+    }catch(e){
+        return 500
+    }
+}
+const deleteSocket = async(user) =>{
+    try{
+
+        await userModel.updateOne({username:user},{socketId:''})
+
+        return true
+
+    }catch(e){
+        return 500
+    }
+}
+
+
+const addToken = async(user,token) =>{
+    try{
+
+        await userModel.updateOne({username:user},{token:token})
+
+        return true
+
+    }catch(e){
+        return 500
+    }
+}
+
+
+const deleteFriend = async(username,friend) =>{
+    try{
+
+        const update = await userModel.findOneAndUpdate({username:username},{$pull:{friends:{username:friend}}},{ new: true })
+
+        return update
+
+    }catch(e){
+        console.log(e);
+        return false
+    }
+}
+
+const findUserbyToken = async(username,token) =>{
+    try{
+
+        const user = await userModel.findOne({username:username,token:token})
+
+        return user
+    }catch(e){
+        return false
+    }
+}
+
+
+const userloggead = async(username) =>{
+    try{
+
+        const update = await userModel.findOneAndUpdate({username:username},{loggead:true})
+
+        return update
+
+    }catch(e){
+        console.log(e);
+        return false
+    }
+}
+const userdisconnected = async(username) =>{
+    try{
+
+        const update = await userModel.findOneAndUpdate({username:username},{loggead:false})
+
+        return update
+
+    }catch(e){
+        console.log(e);
+        return false
+    }
+}
+
+module.exports = {verifyUserEmail,verifyUsername,RegisterUser,updateCodeValidator,searchUsers, addFriend, userAddFriendData,addSocket,deleteFriend,addToken,findUserbyToken,deleteSocket,deleteCodeValidator,userloggead,userdisconnected}

@@ -10,7 +10,7 @@ const nodemailer = require('nodemailer')
  * @returns The `loginMail` function is returning a boolean value. If the email sending process is
  * successful, it will return `true`. If there is an error during the process, it will return `false`.
  */
-const loginMail = (data,code) =>{
+const loginMail = (data,code,username) =>{
 
     try{
         const transporter = nodemailer.createTransport({
@@ -24,8 +24,42 @@ const loginMail = (data,code) =>{
         const mailOptions = {
             from:process.env.userMail,
             to:data,
-            subject:`Hola ${data} !`,
+            subject:`Hola ${username} !`,
             text:`Aqui tienes tu código para iniciar sesion: ${code}`
+        }
+    
+        transporter.sendMail(mailOptions, function(error, info){
+            if (error) {
+              console.log(error);
+            } else {
+              console.log('Email sent: ' + info.response);
+            }
+        });
+
+        return true
+    }catch(e){
+        return false
+    }
+
+
+}
+
+const adviceChat = (friendMail,friend,username) =>{
+
+    try{
+        const transporter = nodemailer.createTransport({
+            service:'gmail',
+            auth:{
+                user:process.env.userMail,
+                pass:process.env.passwordMail
+            }
+        })
+    
+        const mailOptions = {
+            from:process.env.userMail,
+            to:friendMail,
+            subject:`Aviso de chat`,
+            text:`Hola ${friend}! \n ${username} quiere hablar contigo!, entra ya y empieza a hablar con el siguiente enlace: http://localhost:8080`
         }
     
         transporter.sendMail(mailOptions, function(error, info){
@@ -92,4 +126,40 @@ const registerMail = (data,username) =>{
 }
 
 
-module.exports = {loginMail, registerMail}
+
+const newFriendMail = (data,username,friendName,url) =>{
+    console.log(data,username,friendName,url);
+    try{
+        const transporter = nodemailer.createTransport({
+            service:'gmail',
+            auth:{
+                user:process.env.userMail,
+                pass:process.env.passwordMail
+            }
+        })
+    
+        const mailOptions = {
+            from:process.env.userMail,
+            to:data,
+            subject:'Soliciud de amistad',
+            text:`Hola ${username}! \n${friendName} quiere añadirte a su lista de contactos, para aceptarlo ingresa en el siguiente enlace: ${url}`
+        }
+    
+        transporter.sendMail(mailOptions, function(error, info){
+            if (error) {
+              console.log(error);
+            } else {
+              console.log('Email sent: ' + info.response);
+            }
+        });
+
+        return true
+    }catch(e){
+        return false
+    }
+
+
+}
+
+
+module.exports = {loginMail, registerMail, newFriendMail, adviceChat}
