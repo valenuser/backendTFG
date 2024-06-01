@@ -38,7 +38,6 @@ router.post('/messageGpt',cors(corsOptionsDelegate),[
         
         
                 if(gptRequest != false){
-                    console.log(gptRequest["choices"][0]["message"]["content"]);
 
                     const reponse = gptRequest["choices"][0]["message"]["content"]
         

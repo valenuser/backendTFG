@@ -121,10 +121,35 @@ const addFriend = async(user,data) =>{
         return 500
     }
 }
+
 const addSocket = async(user,id) =>{
     try{
 
         await userModel.updateOne({username:user},{socketId:id})
+
+        return true
+
+    }catch(e){
+        return 500
+    }
+}
+const deleteSocket = async(user) =>{
+    try{
+
+        await userModel.updateOne({username:user},{socketId:''})
+
+        return true
+
+    }catch(e){
+        return 500
+    }
+}
+
+
+const addToken = async(user,token) =>{
+    try{
+
+        await userModel.updateOne({username:user},{token:token})
 
         return true
 
@@ -147,5 +172,16 @@ const deleteFriend = async(username,friend) =>{
     }
 }
 
+const findUserbyToken = async(username,token) =>{
+    try{
 
-module.exports = {verifyUserEmail,verifyUsername,RegisterUser,updateCodeValidator,searchUsers, addFriend, userAddFriendData,addSocket,deleteFriend}
+        const user = await userModel.findOne({username:username,token:token})
+
+        return user
+    }catch(e){
+        return false
+    }
+}
+
+
+module.exports = {verifyUserEmail,verifyUsername,RegisterUser,updateCodeValidator,searchUsers, addFriend, userAddFriendData,addSocket,deleteFriend,addToken,findUserbyToken,deleteSocket}

@@ -8,7 +8,7 @@ const { corsOptionsDelegate } = require('../app')
 
 const jwt = require('jsonwebtoken')
 
-const { verifyUserEmail, RegisterUser, updateCodeValidator} = require('../services/UserServices')
+const { verifyUserEmail,deleteSocket} = require('../services/UserServices')
 
 const { body, validationResult} = require('express-validator')
 
@@ -42,9 +42,8 @@ router.post('/',cors(corsOptionsDelegate),[
         if(user.length > 0){
 
             if(user[0].code == code){
-                const token = jwt.sign({user:user[0]},process.env.SECRET_TOKEN_CLIENT)
+                const token = jwt.sign({user:user[0]},process.env.SECRET_TOKEN_CLIENT,{expiresIn:'2h'})
 
-                req.session.token = token
 
                 res.status(200).send({token:token})
 
@@ -69,7 +68,51 @@ router.get('/loggead',cors(corsOptionsDelegate),async(req,res)=>{
 })
 
 
+router.post('/logout',cors(corsOptionsDelegate),[
+    body('token','Token introducido no valido').exists().isString().isLength({min:150})
+],async(req,res)=>{
+    const verify = validationResult(req)
 
+
+    if(verify.isEmpty() == false){
+        const error = verify.array()
+
+        res.status(401).send()
+
+    }else{
+
+        
+        try{
+            const { token } = req.body
+            
+    
+            const verifyToken = jwt.verify(token,process.env.SECRET_TOKEN_CLIENT)
+
+            if(verifyToken){
+
+                const data = jwt.decode(token,process.env.SECRET_TOKEN_CLIENT)
+                
+                const username = data["user"]["username"];
+
+                const updateSocket = await deleteSocket(username)
+
+                if(updateSocket){
+
+                    res.status(200).send()
+
+                }else{
+
+                    res.status(401).send({msg:'El token no es valido'})
+                }
+
+            }
+
+        }catch(e){
+
+            res.status(401).send({msg:'El token no es valido'})
+        }
+    }
+})
 
 
 module.exports = router

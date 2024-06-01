@@ -3,7 +3,7 @@ const { gptmessageModel } = require('../models/gptMessage')
 
 const saveMessage = async(data) =>{
     try{
-        const newMessage = new messageModel({firstUsername:data.firstUsername,secondUsername:data.secondUsername,message:data.message,date:data.date,hour:data.hour})
+        const newMessage = new messageModel({firstUsername:data.firstUsername,secondUsername:data.secondUsername,msg:data.message,date:data.date,hour:data.hour})
 
         console.log(newMessage);
 
@@ -54,6 +54,27 @@ const messagesgptChat = async(data) =>{
     }
 } 
 
+const deleteMessage = async(user,friend,data) =>{
+    try{
+
+        await messageModel.findOneAndDelete({firstUsername:user,secondUsername:friend,date:data.date,msg:data.msg,hour:data.hour})
+        
+        return true
+    }catch(e){
+        return false
+    }
+}
+const deletegptMessage = async(user,friend,data) =>{
+    try{
+
+        await gptmessageModel.findOneAndDelete({firstUsername:data.firstUsername,secondUsername:data.secondUsername,request:data.request,response:data.response,date:data.date,hour:data.hour})
+        
+        return true
+    }catch(e){
+        return false
+    }
+}
 
 
-module.exports = {saveMessage,savegptMessage,messagesChat,messagesgptChat}
+
+module.exports = {saveMessage,savegptMessage,messagesChat,messagesgptChat, deleteMessage, deletegptMessage}

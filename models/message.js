@@ -6,7 +6,7 @@ const { Schema,model } = require('mongoose')
 const messageSchema = new Schema({
     firstUsername:{type:String},
     secondUsername:{type:String},
-    message:{type:String, default:null},
+    msg:{type:String, default:null},
     date:{type:String},
     hour:{type:String}
 })

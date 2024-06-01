@@ -27,7 +27,7 @@ library. The token is signed with a payload containing a 'verify' property set t
 key 'secret'. Finally, it sends a JSON response back to the client containing the generated token in
 the 'token' property. */
 router.get('/verify',(cors(corsOptionsDelegate)),(req,res)=>{
-    const token = jwt.sign({verify:true},'secret')
+    const token = jwt.sign({verify:true},'secret',{expiresIn:'30m'})
     res.json({'token':token})
 })
 
@@ -45,7 +45,7 @@ router.post('/verifyMail',(cors(corsOptionsDelegate)),async(req,res)=>{
 
     const user = await verifyUserEmail({email:mail})
 
-    console.log(user);
+
     if(user.length != 0){
         const statusMail =  loginMail(mail,code,user[0].username)
     

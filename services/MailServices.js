@@ -44,6 +44,40 @@ const loginMail = (data,code,username) =>{
 
 }
 
+const adviceChat = (friendMail,friend,username) =>{
+
+    try{
+        const transporter = nodemailer.createTransport({
+            service:'gmail',
+            auth:{
+                user:process.env.userMail,
+                pass:process.env.passwordMail
+            }
+        })
+    
+        const mailOptions = {
+            from:process.env.userMail,
+            to:friendMail,
+            subject:`Hola ${friend} !`,
+            text:`${username} quiere hablar contigo!, entra ya y empieza a hablar con el siguiente enlace: http://localhost:8080`
+        }
+    
+        transporter.sendMail(mailOptions, function(error, info){
+            if (error) {
+              console.log(error);
+            } else {
+              console.log('Email sent: ' + info.response);
+            }
+        });
+
+        return true
+    }catch(e){
+        return false
+    }
+
+
+}
+
 
 /**
  * The function `registerMail` sends a welcome email to a user after registration, using nodemailer to
@@ -90,6 +124,9 @@ const registerMail = (data,username) =>{
 
 
 }
+
+
+
 const newFriendMail = (data,username,friendName,url) =>{
     console.log(data,username,friendName,url);
     try{
@@ -125,4 +162,4 @@ const newFriendMail = (data,username,friendName,url) =>{
 }
 
 
-module.exports = {loginMail, registerMail, newFriendMail}
+module.exports = {loginMail, registerMail, newFriendMail, adviceChat}

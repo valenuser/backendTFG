@@ -84,7 +84,6 @@ router.post('/verifyTokenChat',cors(corsOptionsDelegate),[
 
                 const data = jwt.decode(token,process.env.SECRET_TOKEN_CLIENT)
 
-                console.log(data);
 
 
                 const user = await verifyUsername({username:data["user"][0]["username"]})
@@ -147,7 +146,6 @@ router.post('/addFriendToken',cors(corsOptionsDelegate),[
 
                 const data = jwt.decode(token,process.env.SECRET_TOKEN_CLIENT)
 
-                console.log(data);
 
                 res.status(200).send(data)
 
@@ -192,8 +190,6 @@ router.post('/chatToken',cors(corsOptionsDelegate),[
 
                 const data = jwt.decode(token,process.env.SECRET_TOKEN_CLIENT)
 
-                console.log(data["user"]["username"]);
-                console.log(friend["username"]);
 
                 const user = await verifyUsername({username:data["user"]["username"]})
 
@@ -202,7 +198,7 @@ router.post('/chatToken',cors(corsOptionsDelegate),[
                     const friendData = await verifyUsername({username:friend["username"]})
 
                     if(friendData){
-                        const newToken = jwt.sign({user:user,friend:friendData},process.env.SECRET_TOKEN_CLIENT)
+                        const newToken = jwt.sign({user:user,friend:friendData},process.env.SECRET_TOKEN_CLIENT,{expiresIn:'2h'})
 
                         res.status(200).send(newToken)
 

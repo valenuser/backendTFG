@@ -46,9 +46,9 @@ router.post('/add',cors(corsOptionsDelegate),[
 
             if(user !== false){
 
-                const token = jwt.sign({user:user[0], friend:data["user"]},process.env.SECRET_TOKEN_CLIENT,{expiresIn:'1800s'})
+                const token = jwt.sign({user:user[0], friend:data["user"]},process.env.SECRET_TOKEN_CLIENT,{expiresIn:'30m'})
 
-                const url =`http://localhost:8080/newFriend/${token}`
+                const url =`http://192.168.1.11:8080/newFriend/${token}`
 
 
                 const sendEmail = newFriendMail(user[0]["email"],user[0]["username"],data["user"]["username"],url)

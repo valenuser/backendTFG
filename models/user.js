@@ -10,8 +10,7 @@ const userSchema = new Schema({
     firstTime:{type:Boolean,default:true},
     socketId:{type:String,default:''},
     friends:[],
-    groups:[],
-    online:{type:Boolean,default:false}
+    groups:[]
 })
 
 

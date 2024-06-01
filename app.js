@@ -60,7 +60,7 @@ app.use((req,res)=>{
     res.json({msg:'Ruta no dsponible.'})
 })
 
-const {addSocket } = require('./services/UserServices')
+const {addSocket, verifyUsername } = require('./services/UserServices')
 
 //socket connection
 
@@ -81,7 +81,8 @@ io.on('connection',(socket) =>{
     })
 
     socket.on('message',(msg)=>{
-        addSocket(msg["user"]["username"],socket.id)
+        console.log(`connected ${socket.id}`);
+         addSocket(msg["user"]["username"],socket.id)
 
         socket.emit('message',{id:socket.id})
     })
@@ -98,6 +99,43 @@ io.on('connection',(socket) =>{
     socket.on('backMain',(msg)=>{
         
         socket.to(msg["id"]).emit('backMain')
+    })
+
+    socket.on('notificationLoggead',(msg)=>{
+
+        console.log('a');
+
+        if(msg["user"]["friends"].length > 0 ){
+            msg["user"]["friends"].forEach(async(element) => {
+
+                const data = await verifyUsername({username:element["username"]})
+                
+                data.forEach(element =>{
+
+                    socket.to(element["socketId"]).emit('notificationLoggead',`${msg["user"]["username"]} esta disponible!`)
+
+                })
+            });
+        }
+
+        
+    })
+    socket.on('notAvailable',(msg)=>{
+
+        if(msg["user"]["friends"].length > 0 ){
+            msg["user"]["friends"].forEach(async(element) => {
+
+                const data = await verifyUsername({username:element["username"]})
+                
+                data.forEach(element =>{
+
+                    socket.to(element["socketId"]).emit('notAvailable',`${msg["user"]["username"]} no esta disponible.`)
+
+                })
+            });
+        }
+
+        
     })
 })
 
