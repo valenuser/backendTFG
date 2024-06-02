@@ -46,7 +46,7 @@ router.post('/add',cors(corsOptionsDelegate),[
 
             if(user !== false){
 
-                const newToken = jwt.sign({user:user[0], friend:data["user"]},process.env.SECRET_TOKEN_CLIENT)
+                const newToken = jwt.sign({user:user[0], friend:data["user"]},process.env.SECRET_TOKEN_CLIENT,{ algorithm: 'HS256' })
 
                 const url =`http://192.168.1.11:8080/newFriend/${newToken}`
 
